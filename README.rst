@@ -13,3 +13,4 @@ For more information, please refer to the following resources:
 * **Blueprints:** https://blueprints.launchpad.net/magnum
 * **Bugs:** http://bugs.launchpad.net/magnum
 * **REST Client:** http://git.openstack.org/cgit/openstack/python-magnumclient
+ 
