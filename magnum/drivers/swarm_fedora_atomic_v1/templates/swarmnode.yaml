@@ -171,15 +171,6 @@ parameters:
 
 resources:
 
-  # --------------
-  enable_cadvisor:
-    type: OS::Heat::SoftwareConfig
-    properties:
-      group: ungrouped
-      config: {get_file: ../../common/templates/fragments/enable-cadvisor.sh}
-
-  # --------------
-
   node_wait_handle:
     type: "OS::Heat::WaitConditionHandle"
 
@@ -263,6 +254,15 @@ resources:
       group: ungrouped
       config: {get_file: ../../common/templates/fragments/configure-docker-registry.sh}
 
+  # --------------
+  enable_cadvisor:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: ../../common/templates/fragments/enable-cadvisor.sh}
+
+  # --------------
+
   write_docker_service:
     type: "OS::Heat::SoftwareConfig"
     properties:
@@ -343,6 +343,7 @@ resources:
     type: "OS::Heat::MultipartMime"
     properties:
       parts:
+        - config: {get_resource: enable_cadvisor}
         - config: {get_resource: disable_selinux}
         - config: {get_resource: remove_docker_key}
         - config: {get_resource: write_heat_params}
