@@ -7,6 +7,14 @@ description: >
 
 parameters:
 
+  # --------------
+  monitoring_enabled:
+    type: boolean
+    description: >
+      whether or not to have the cadvisor running on the node
+
+  # --------------
+
   server_image:
     type: string
     description: glance image used to boot the server
@@ -163,6 +171,15 @@ parameters:
 
 resources:
 
+  # --------------
+  enable_cadvisor:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: {get_file: ../../common/templates/fragments/enable-cadvisor.sh}
+
+  # --------------
+
   node_wait_handle:
     type: "OS::Heat::WaitConditionHandle"
 
@@ -185,6 +202,7 @@ resources:
         str_replace:
           template: {get_file: ../../common/templates/swarm/fragments/write-heat-params-node.yaml}
           params:
+            "$MONITORING_ENABLED": {get_param: monitoring_enabled}
             "$WAIT_HANDLE_ENDPOINT": {get_attr: [node_wait_handle, endpoint]}
             "$WAIT_HANDLE_TOKEN": {get_attr: [node_wait_handle, token]}
             "$WAIT_CURL": {get_attr: [node_wait_handle, curl_cli]}

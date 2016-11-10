@@ -40,6 +40,15 @@ parameters:
   #
   # OPTIONAL PARAMETERS
   #
+
+  # --------------
+  monitoring_enabled:
+    type: boolean
+    default: false
+    description: >
+      whether or not to have the grafana-prometheus-cadvisor monitoring setup
+
+  # --------------
   master_flavor:
     type: string
     default: m1.small
@@ -511,3 +520,9 @@ outputs:
     value: {get_param: discovery_url}
     description: >
       This the discovery url for Swarm cluster.
+
+  monitoring_url:
+    value: "tbd"
+    description: >
+      This is the url for the Grafana web page
+    condition: {equals: [{get_param: monitoring_enabled}, true]}
