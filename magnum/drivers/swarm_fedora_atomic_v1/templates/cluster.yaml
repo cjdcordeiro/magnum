@@ -44,7 +44,7 @@ parameters:
   # --------------
   monitoring_enabled:
     type: boolean
-    default: false
+    default: true
     description: >
       whether or not to have the grafana-prometheus-cadvisor monitoring setup
 
@@ -446,6 +446,7 @@ resources:
       resource_def:
         type: swarmnode.yaml
         properties:
+          ssh_key_name: {get_param: monitoring_enabled}
           ssh_key_name: {get_param: ssh_key_name}
           server_image: {get_param: server_image}
           server_flavor: {get_param: node_flavor}
