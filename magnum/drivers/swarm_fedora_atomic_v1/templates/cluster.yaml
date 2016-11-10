@@ -526,4 +526,3 @@ outputs:
     value: "tbd"
     description: >
       This is the url for the Grafana web page
-    condition: {equals: [{get_param: monitoring_enabled}, true]}

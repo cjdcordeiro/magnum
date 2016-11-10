@@ -273,16 +273,6 @@ resources:
             "$WAIT_HANDLE_ENDPOINT": {get_attr: [node_wait_handle, endpoint]}
             "$WAIT_HANDLE_TOKEN": {get_attr: [node_wait_handle, token]}
 
-  enable_cadvisor:
-    type: "OS::Heat::SoftwareConfig"
-    condition: {equals: [{get_param: monitoring_enabled}, true]}
-    properties:
-      group: ungrouped
-      config:
-        str_replace:
-          template: {get_file: ../../common/templates/swarm/fragments/enable-services.sh}
-          params:
-            "$NODE_SERVICES": "swarm-cadvisor"
   # --------------
 
   write_docker_service:
@@ -335,7 +325,7 @@ resources:
         str_replace:
           template: {get_file: ../../common/templates/swarm/fragments/enable-services.sh}
           params:
-            "$NODE_SERVICES": "docker.socket swarm-agent"
+            "$NODE_SERVICES": "docker.socket swarm-agent swarm-cadvisor"
 
   cfn_signal:
     type: "OS::Heat::SoftwareConfig"
