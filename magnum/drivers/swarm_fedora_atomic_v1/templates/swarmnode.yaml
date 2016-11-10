@@ -255,12 +255,34 @@ resources:
       config: {get_file: ../../common/templates/fragments/configure-docker-registry.sh}
 
   # --------------
-  enable_cadvisor:
-    type: OS::Heat::SoftwareConfig
+  write_cadvisor_service:
+    type: "OS::Heat::SoftwareConfig"
     properties:
       group: ungrouped
-      config: {get_file: ../../common/templates/fragments/enable-cadvisor.sh}
+      config: {get_file: ../../common/templates/swarm/fragments/write-swarm-cadvisor-service.sh}
 
+  write_swarm_cadvisor_failure_service:
+    type: "OS::Heat::SoftwareConfig"
+    properties:
+      group: ungrouped
+      config:
+        str_replace:
+          template: {get_file: ../../common/templates/swarm/fragments/write-cluster-failure-service.yaml}
+          params:
+            "$SERVICE": swarm-cadvisor
+            "$WAIT_HANDLE_ENDPOINT": {get_attr: [node_wait_handle, endpoint]}
+            "$WAIT_HANDLE_TOKEN": {get_attr: [node_wait_handle, token]}
+
+  enable_cadvisor:
+    type: "OS::Heat::SoftwareConfig"
+    condition: {equals: [{get_param: monitoring_enabled}, true]}
+    properties:
+      group: ungrouped
+      config:
+        str_replace:
+          template: {get_file: ../../common/templates/swarm/fragments/enable-services.sh}
+          params:
+            "$NODE_SERVICES": "swarm-cadvisor"
   # --------------
 
   write_docker_service:
@@ -343,7 +365,8 @@ resources:
     type: "OS::Heat::MultipartMime"
     properties:
       parts:
-        - config: {get_resource: enable_cadvisor}
+        - config: {get_resource: write_cadvisor_service}
+        - config: {get_resource: write_swarm_cadvisor_failure_service}
         - config: {get_resource: disable_selinux}
         - config: {get_resource: remove_docker_key}
         - config: {get_resource: write_heat_params}
