@@ -326,6 +326,8 @@ resources:
           template: {get_file: ../../common/templates/swarm/fragments/enable-services.sh}
           params:
             "$NODE_SERVICES": "docker.socket swarm-cadvisor swarm-agent"
+            "$MONITORING_ENABLED": {get_param: monitoring_enabled}
+
 
   cfn_signal:
     type: "OS::Heat::SoftwareConfig"
