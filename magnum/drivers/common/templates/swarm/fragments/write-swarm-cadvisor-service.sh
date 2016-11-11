@@ -24,11 +24,9 @@ ExecStart=/usr/bin/docker run -e http_proxy=$HTTP_PROXY \\
                               --volume=/sys:/sys:ro \\
                               --volume=/var/lib/docker/:/var/lib/docker:ro \\
                               --publish=8080:8080 \\
-                              --detach=true \\
                               --name swarm-cadvisor \\
                               google/cadvisor:latest
 ExecStop=/usr/bin/docker stop swarm-cadvisor
-ExecStartPost=/usr/local/bin/notify-heat
 
 [Install]
 WantedBy=multi-user.target
