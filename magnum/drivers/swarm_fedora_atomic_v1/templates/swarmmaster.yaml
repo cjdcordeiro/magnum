@@ -300,8 +300,8 @@ resources:
           template: {get_file: ../../common/templates/swarm/fragments/write-cluster-failure-service.yaml}
           params:
             "$SERVICE": swarm-cadvisor
-            "$WAIT_HANDLE_ENDPOINT": {get_attr: [node_wait_handle, endpoint]}
-            "$WAIT_HANDLE_TOKEN": {get_attr: [node_wait_handle, token]}
+            "$WAIT_HANDLE_ENDPOINT": {get_attr: [master_wait_handle, endpoint]}
+            "$WAIT_HANDLE_TOKEN": {get_attr: [master_wait_handle, token]}
 
   # --------------
 
