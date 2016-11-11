@@ -1,9 +1,11 @@
 #!/bin/sh
 
+. /etc/sysconfig/heat-params
+
 echo "starting services"
 systemctl daemon-reload
 for service in $NODE_SERVICES; do
-    if [ "$service" = "swarm-cadvisor" ] && \\
+    if [ "$service" = "swarm-cadvisor" ] && \
       [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]; then
         continue
     fi

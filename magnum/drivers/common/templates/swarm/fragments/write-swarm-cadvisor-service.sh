@@ -35,17 +35,6 @@ EOF
 chown root:root $CONF_FILE
 chmod 644 $CONF_FILE
 
-SCRIPT=/usr/local/bin/notify-heat
-
-cat > $SCRIPT << EOF
-#!/bin/sh
-curl -k -i -X POST -H 'Content-Type: application/json' -H 'X-Auth-Token: $WAIT_HANDLE_TOKEN' \
-    --data-binary "'"'{"Status": "SUCCESS", "Reason": "Swarm agent ready", "Data": "OK", "UniqueId": "00000"}'"'" \
-    "$WAIT_HANDLE_ENDPOINT"
-EOF
-
-chown root:root $SCRIPT
-chmod 755 $SCRIPT
 
 
 
