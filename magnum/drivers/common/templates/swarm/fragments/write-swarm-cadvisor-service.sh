@@ -12,9 +12,8 @@ Requires=docker.service
 OnFailure=swarm-cadvisor-failure.service
 
 [Service]
-TimeoutStartSec=0
 ExecStartPre=-/usr/bin/docker kill swarm-cadvisor
-ExecStartPre=-/usr/bin/docker rm swarm-cadvisor
+ExecStartPre=-/usr/bin/docker rm -f swarm-cadvisor
 ExecStartPre=-/usr/bin/docker pull google/cadvisor:latest
 ExecStart=/usr/bin/docker run -e http_proxy=$HTTP_PROXY \\
                               -e https_proxy=$HTTPS_PROXY \\
@@ -34,24 +33,3 @@ EOF
 
 chown root:root $CONF_FILE
 chmod 644 $CONF_FILE
-
-
-
-
-
-
-# . /etc/sysconfig/heat-params
-#
-# if [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]; then
-#     exit 0
-# fi
-#
-# sudo docker run \
-#   --volume=/:/rootfs:ro \
-#   --volume=/var/run:/var/run:rw \
-#   --volume=/sys:/sys:ro \
-#   --volume=/var/lib/docker/:/var/lib/docker:ro \
-#   --publish=8080:8080 \
-#   --detach=true \
-#   --name=cadvisor \
-#   google/cadvisor:latest

@@ -83,6 +83,8 @@ class SwarmFedoraTemplateDefinition(template_def.BaseTemplateDefinition):
                         cluster_attr='node_addresses')
         self.add_output('discovery_url',
                         cluster_attr='discovery_url')
+        self.add_output('monitoring_url',
+                        cluster_attr='monitoring_url')
 
     def get_params(self, context, cluster_template, cluster, **kwargs):
         extra_params = kwargs.pop('extra_params', {})
