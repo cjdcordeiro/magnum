@@ -2,13 +2,6 @@
 
 . /etc/sysconfig/heat-params
 
-if [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]
-then
-  AFTER_SERVICE="docker.service"
-else
-  AFTER_SERVICE="swarm-cadvisor"
-fi
-
 myip="$SWARM_NODE_IP"
 
 CONF_FILE=/etc/systemd/system/swarm-agent.service
@@ -16,7 +9,7 @@ CONF_FILE=/etc/systemd/system/swarm-agent.service
 cat > $CONF_FILE << EOF
 [Unit]
 Description=Swarm Agent
-After=$AFTER_SERVICE
+After=docker.service
 Requires=docker.service
 OnFailure=swarm-agent-failure.service
 

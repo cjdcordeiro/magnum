@@ -380,7 +380,7 @@ resources:
         str_replace:
           template: {get_file: ../../common/templates/swarm/fragments/enable-services.sh}
           params:
-            "$NODE_SERVICES": "etcd docker.socket swarm-cadvisor swarm-node-exporter swarm-manager"
+            "$NODE_SERVICES": "etcd docker.socket swarm-manager swarm-cadvisor swarm-node-exporter"
             "$MONITORING_ENABLED": {get_param: monitoring_enabled}
 
   cfn_signal:

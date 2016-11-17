@@ -343,9 +343,7 @@ resources:
         str_replace:
           template: {get_file: ../../common/templates/swarm/fragments/enable-services.sh}
           params:
-            "$NODE_SERVICES": "docker.socket swarm-cadvisor swarm-node-exporter swarm-agent"
-            "$MONITORING_ENABLED": {get_param: monitoring_enabled}
-
+            "$NODE_SERVICES": "docker.socket swarm-agent swarm-cadvisor swarm-node-exporter"
 
   cfn_signal:
     type: "OS::Heat::SoftwareConfig"
