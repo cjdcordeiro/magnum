@@ -255,41 +255,54 @@ resources:
       config: {get_file: ../../common/templates/fragments/configure-docker-registry.sh}
 
   # --------------
-  write_cadvisor_service:
-    type: "OS::Heat::SoftwareConfig"
-    properties:
-      group: ungrouped
-      config: {get_file: ../../common/templates/swarm/fragments/write-swarm-cadvisor-service.sh}
 
-  write_node_exporter_service:
+  start_cadvisor:
     type: "OS::Heat::SoftwareConfig"
     properties:
       group: ungrouped
-      config: {get_file: ../../common/templates/swarm/fragments/write-swarm-node-exporter-service.sh}
+      config: {get_file: ../../common/templates/fragments/start_cadvisor.sh}
 
-  write_swarm_node_exporter_failure_service:
+  start_node_exporter:
     type: "OS::Heat::SoftwareConfig"
     properties:
       group: ungrouped
-      config:
-        str_replace:
-          template: {get_file: ../../common/templates/swarm/fragments/write-cluster-failure-service.yaml}
-          params:
-            "$SERVICE": swarm-node-exporter
-            "$WAIT_HANDLE_ENDPOINT": {get_attr: [node_wait_handle, endpoint]}
-            "$WAIT_HANDLE_TOKEN": {get_attr: [node_wait_handle, token]}
+      config: {get_file: ../../common/templates/fragments/start_node_exporter.sh}
 
-  write_swarm_cadvisor_failure_service:
-    type: "OS::Heat::SoftwareConfig"
-    properties:
-      group: ungrouped
-      config:
-        str_replace:
-          template: {get_file: ../../common/templates/swarm/fragments/write-cluster-failure-service.yaml}
-          params:
-            "$SERVICE": swarm-cadvisor
-            "$WAIT_HANDLE_ENDPOINT": {get_attr: [node_wait_handle, endpoint]}
-            "$WAIT_HANDLE_TOKEN": {get_attr: [node_wait_handle, token]}
+  # write_cadvisor_service:
+  #   type: "OS::Heat::SoftwareConfig"
+  #   properties:
+  #     group: ungrouped
+  #     config: {get_file: ../../common/templates/swarm/fragments/write-swarm-cadvisor-service.sh}
+  #
+  # write_node_exporter_service:
+  #   type: "OS::Heat::SoftwareConfig"
+  #   properties:
+  #     group: ungrouped
+  #     config: {get_file: ../../common/templates/swarm/fragments/write-swarm-node-exporter-service.sh}
+  #
+  # write_swarm_node_exporter_failure_service:
+  #   type: "OS::Heat::SoftwareConfig"
+  #   properties:
+  #     group: ungrouped
+  #     config:
+  #       str_replace:
+  #         template: {get_file: ../../common/templates/swarm/fragments/write-cluster-failure-service.yaml}
+  #         params:
+  #           "$SERVICE": swarm-node-exporter
+  #           "$WAIT_HANDLE_ENDPOINT": {get_attr: [node_wait_handle, endpoint]}
+  #           "$WAIT_HANDLE_TOKEN": {get_attr: [node_wait_handle, token]}
+  #
+  # write_swarm_cadvisor_failure_service:
+  #   type: "OS::Heat::SoftwareConfig"
+  #   properties:
+  #     group: ungrouped
+  #     config:
+  #       str_replace:
+  #         template: {get_file: ../../common/templates/swarm/fragments/write-cluster-failure-service.yaml}
+  #         params:
+  #           "$SERVICE": swarm-cadvisor
+  #           "$WAIT_HANDLE_ENDPOINT": {get_attr: [node_wait_handle, endpoint]}
+  #           "$WAIT_HANDLE_TOKEN": {get_attr: [node_wait_handle, token]}
 
   # --------------
 
@@ -343,7 +356,7 @@ resources:
         str_replace:
           template: {get_file: ../../common/templates/swarm/fragments/enable-services.sh}
           params:
-            "$NODE_SERVICES": "docker.socket swarm-agent swarm-cadvisor swarm-node-exporter"
+            "$NODE_SERVICES": "docker.socket swarm-agent"
 
   cfn_signal:
     type: "OS::Heat::SoftwareConfig"
@@ -373,10 +386,8 @@ resources:
     type: "OS::Heat::MultipartMime"
     properties:
       parts:
-        - config: {get_resource: write_cadvisor_service}
-        - config: {get_resource: write_swarm_cadvisor_failure_service}
-        - config: {get_resource: write_node_exporter_service}
-        - config: {get_resource: write_swarm_node_exporter_failure_service}
+        - config: {get_resource: start_node_exporter}
+        - config: {get_resource: start_cadvisor}
         - config: {get_resource: disable_selinux}
         - config: {get_resource: remove_docker_key}
         - config: {get_resource: write_heat_params}
