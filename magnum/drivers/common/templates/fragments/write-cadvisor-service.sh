@@ -2,18 +2,19 @@
 
 . /etc/sysconfig/heat-params
 
-CONF_FILE=/etc/systemd/system/swarm-cadvisor.service
+CONF_FILE=/etc/systemd/system/cadvisor.service
 
 cat > $CONF_FILE << EOF
 [Unit]
-Description=Swarm cadvisor
+Description=cadvisor
 After=docker.service
 Requires=docker.service
-OnFailure=swarm-cadvisor-failure.service
+OnFailure=cadvisor-failure.service
 
 [Service]
-ExecStartPre=-/usr/bin/docker kill swarm-cadvisor
-ExecStartPre=-/usr/bin/docker rm -f swarm-cadvisor
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill cadvisor
+ExecStartPre=-/usr/bin/docker rm cadvisor
 ExecStartPre=-/usr/bin/docker pull google/cadvisor:latest
 ExecStart=/usr/bin/docker run -e http_proxy=$HTTP_PROXY \\
                               -e https_proxy=$HTTPS_PROXY \\
@@ -23,9 +24,9 @@ ExecStart=/usr/bin/docker run -e http_proxy=$HTTP_PROXY \\
                               --volume=/sys:/sys:ro \\
                               --volume=/var/lib/docker/:/var/lib/docker:ro \\
                               --publish=8080:8080 \\
-                              --name swarm-cadvisor \\
+                              --name cadvisor \\
                               google/cadvisor:latest
-ExecStop=/usr/bin/docker stop swarm-cadvisor
+ExecStop=/usr/bin/docker stop cadvisor
 
 [Install]
 WantedBy=multi-user.target
