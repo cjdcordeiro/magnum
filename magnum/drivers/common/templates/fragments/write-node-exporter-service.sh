@@ -12,7 +12,7 @@ Requires=docker.service
 OnFailure=node-exporter-failure.service
 
 [Service]
-TimeoutStartSec=120
+TimeoutStartSec=300
 ExecStartPre=-/usr/bin/docker kill node-exporter
 ExecStartPre=-/usr/bin/docker rm node-exporter
 ExecStartPre=-/usr/bin/docker pull prom/node-exporter

@@ -12,7 +12,7 @@ Requires=docker.service
 OnFailure=cadvisor-failure.service
 
 [Service]
-TimeoutStartSec=120
+TimeoutStartSec=300
 ExecStartPre=-/usr/bin/docker kill cadvisor
 ExecStartPre=-/usr/bin/docker rm cadvisor
 ExecStartPre=-/usr/bin/docker pull google/cadvisor:latest
