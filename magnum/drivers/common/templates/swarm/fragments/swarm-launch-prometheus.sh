@@ -15,7 +15,7 @@ SERVER_KEY="/etc/docker/server.key"
 docker -H $API_IP_ADDRESS:2376 --tlsverify --tlscacert $CLUSTER_CA \
                           --tlskey $SERVER_KEY --tlscert $SERVER_CERTIFICATE \
                           run -t -p 9090:9090 \
-                          -v $PROM_CONF_DIR_HOST:$PROM_CONF_DIR_CONTAINER \
+                          -v $PROM_CONF_DIR_HOST:$PROM_CONF_DIR_CONTAINER:z \
                           -v /prometheus --link cadvisor:cadvisor \
                           --link node-exporter:node-exporter \
                           --name prometheus prom/prometheus \
