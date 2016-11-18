@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]; then
+  exit 0
+fi
+
 . /etc/sysconfig/heat-params
 
 CONF_FILE=/etc/systemd/system/node-exporter.service
