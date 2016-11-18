@@ -379,7 +379,7 @@ resources:
     type: "OS::Heat::SoftwareConfig"
     properties:
       group: ungrouped
-      config: {get_file: ../../common/templates/swarm/fragments/swarm_prometheus.sh}
+      config: {get_file: ../../common/templates/swarm/fragments/swarm_launch_prometheus.sh}
 
 
   swarm_node_init:
