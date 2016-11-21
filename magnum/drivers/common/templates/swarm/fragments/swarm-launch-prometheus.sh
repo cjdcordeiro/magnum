@@ -1,6 +1,7 @@
 #!/bin/sh
 
-cat >/usr/local/bin/start-prometheus << EOF
+START_PROMETHEUS="/usr/local/bin/start-prometheus"
+cat >$START_PROMETHEUS << EOF
 . /etc/sysconfig/heat-params
 . /etc/sysconfig/prometheus-conf-setup
 
@@ -19,3 +20,6 @@ docker -H $API_IP_ADDRESS:2376 --tlsverify --tlscacert $CLUSTER_CA \
                           -config.file=$PROM_CONF_DIR_CONTAINER"/prometheus.yml" \
                           -storage.local.path=/prometheus
 EOF
+
+chown root:root $START_PROMETHEUS
+chmod 755 $START_PROMETHEUS
