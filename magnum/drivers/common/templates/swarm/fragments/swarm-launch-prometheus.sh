@@ -1,9 +1,6 @@
 #!/bin/sh
 
-if [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]; then
-  exit 0
-fi
-
+cat >/usr/local/bin/start-prometheus << EOF
 . /etc/sysconfig/heat-params
 . /etc/sysconfig/prometheus-conf-setup
 
@@ -21,3 +18,4 @@ docker -H $API_IP_ADDRESS:2376 --tlsverify --tlscacert $CLUSTER_CA \
                           --name prometheus prom/prometheus \
                           -config.file=$PROM_CONF_DIR_CONTAINER"/prometheus.yml" \
                           -storage.local.path=/prometheus
+EOF

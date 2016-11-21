@@ -1,10 +1,10 @@
 #!/bin/sh
 
+. /etc/sysconfig/heat-params
+
 if [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]; then
   exit 0
 fi
-
-. /etc/sysconfig/heat-params
 
 CONF_FILE=/etc/systemd/system/cadvisor.service
 
@@ -31,6 +31,7 @@ ExecStart=/usr/bin/docker run -e http_proxy=$HTTP_PROXY \\
                               --name cadvisor \\
                               google/cadvisor:latest
 ExecStop=/usr/bin/docker stop cadvisor
+ExecStartPost=/usr/local/bin/start-prometheus
 
 [Install]
 WantedBy=multi-user.target

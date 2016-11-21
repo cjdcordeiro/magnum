@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. /etc/sysconfig/heat-params
+
 if [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]; then
   exit 0
 fi

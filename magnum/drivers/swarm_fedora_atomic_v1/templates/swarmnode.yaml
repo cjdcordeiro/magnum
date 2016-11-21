@@ -393,6 +393,8 @@ resources:
         - config: {get_resource: network_service}
         - config: {get_resource: configure_docker_storage}
         - config: {get_resource: configure_docker_registry}
+        - config: {get_resource: prometheus_setup}
+        - config: {get_resource: swarm_launch_prometheus}
         - config: {get_resource: write_cadvisor_service}
         - config: {get_resource: write_cadvisor_failure_service}
         - config: {get_resource: write_node_exporter_service}
@@ -406,8 +408,7 @@ resources:
         - config: {get_resource: enable_services}
         - config: {get_resource: cfn_signal}
         - config: {get_resource: volume_service}
-        - config: {get_resource: prometheus_setup}
-        - config: {get_resource: swarm_launch_prometheus}
+
 
   swarm_node:
     type: "OS::Nova::Server"
