@@ -12,9 +12,9 @@ CLUSTER_CA='/etc/docker/ca.crt'
 SERVER_CERTIFICATE='/etc/docker/server.crt'
 SERVER_KEY='/etc/docker/server.key'
 
-while [ `docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
+while [ \`docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
-                          info | grep 'Nodes:' | awk '{print \$2}'` -lt 1 ]
+                          info | grep 'Nodes:' | awk '{print \$2}'\` -lt 1 ]
 do
   echo 'Waiting for available nodes...'
   sleep 5
