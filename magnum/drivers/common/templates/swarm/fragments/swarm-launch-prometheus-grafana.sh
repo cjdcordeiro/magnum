@@ -36,7 +36,17 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                           run -t -p 3000:3000 -v /var/lib/grafana:/var/lib/grafana \\
                           -e constraint:node==\`hostname -s\` \\
-                          -e "GF_SECURITY_ADMIN_PASSWORD=admin" grafana/grafana
+                          -e "GF_SECURITY_ADMIN_PASSWORD=admin" \\
+                          --name grafana grafana/grafana
+
+docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
+                          --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
+                          run -t -v /etc/docker:/etc/docker \\
+                          -v /etc/sysconfig:/etc/sysconfig \\
+                          -v $PROM_SD_CRON:/etc/cron.d/
+                          -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
+                          -e constraint:node==\`hostname -s\` \\
+                          --name prometheus_auto_sd fedora
 EOF
 
 chown root:root $START_PROMETHEUS
