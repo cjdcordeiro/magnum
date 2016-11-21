@@ -1,15 +1,24 @@
 #!/bin/sh
 
-START_PROMETHEUS="/usr/local/bin/start-prometheus"
-cat >$START_PROMETHEUS << EOF
 . /etc/sysconfig/heat-params
 . /etc/sysconfig/prometheus-conf-setup
 
+START_PROMETHEUS="/usr/local/bin/start-prometheus"
+cat >$START_PROMETHEUS << EOF
 # Setup the API client for swarm
 CLUSTER_CA="/etc/docker/ca.crt"
 SERVER_CERTIFICATE="/etc/docker/server.crt"
 SERVER_KEY="/etc/docker/server.key"
 
+while [ `docker -H $API_IP_ADDRESS:2376 --tlsverify --tlscacert $CLUSTER_CA \
+                          --tlskey $SERVER_KEY --tlscert $SERVER_CERTIFICATE \
+                          info | grep "Nodes:" | awk -F' ' '{print $2}'` -lt 1 ]
+do
+  echo "Waiting for available nodes..."
+  sleep 5
+done
+
+# Following will fail if already exists
 docker -H $API_IP_ADDRESS:2376 --tlsverify --tlscacert $CLUSTER_CA \
                           --tlskey $SERVER_KEY --tlscert $SERVER_CERTIFICATE \
                           run -t -p 9090:9090 \
