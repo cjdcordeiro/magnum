@@ -1,6 +1,6 @@
 #!/bin/sh
 
-START_PROMETHEUS='/usr/local/bin/start-prometheus'
+START_PROMETHEUS='/usr/local/bin/start-prometheus-grafana'
 
 cat >$START_PROMETHEUS <<EOF
 #!/bin/sh
@@ -27,9 +27,16 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
                           -v /prometheus --link cadvisor:cadvisor \\
                           --link node-exporter:node-exporter \\
+                          -e constraint:node==\`hostname -s\` \\
                           --name prometheus prom/prometheus \\
                           -config.file=\$PROM_CONF_DIR_CONTAINER'/prometheus.yml' \\
                           -storage.local.path=/prometheus
+
+docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
+                          --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
+                          run -t -p 3000:3000 -v /var/lib/grafana:/var/lib/grafana \\
+                          -e constraint:node==\`hostname -s\` \\
+                          -e "GF_SECURITY_ADMIN_PASSWORD=admin" grafana/grafana
 EOF
 
 chown root:root $START_PROMETHEUS

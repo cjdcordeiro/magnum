@@ -31,7 +31,7 @@ ExecStart=/usr/bin/docker run -e http_proxy=$HTTP_PROXY \\
                               --name cadvisor \\
                               google/cadvisor:latest
 ExecStop=/usr/bin/docker stop cadvisor
-ExecStartPost=[ -f /usr/local/bin/start-prometheus ] && /usr/local/bin/start-prometheus
+ExecStartPost=[ -f /usr/local/bin/start-prometheus-grafana ] && /usr/local/bin/start-prometheus-grafana
 
 [Install]
 WantedBy=multi-user.target

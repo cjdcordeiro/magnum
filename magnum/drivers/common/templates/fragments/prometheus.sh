@@ -40,3 +40,11 @@ cat > $SERVICE_DISCOVERY_FILE << SD_EOF
   labels:
     job: magnum-prometheus
 SD_EOF
+
+SERVICE_DISCOVERY_CRON=$PROMETHEUS_SHARE"/cron.d"
+mkdir $SERVICE_DISCOVERY_CRON
+
+SD_CRONJOB=$SERVICE_DISCOVERY_CRON"/prometheus-sd"
+cat > $SD_CRONJOB <<EOF
+0 * * * * $PROMETHEUS_SHARE_MOUNT"/prometheus-sd" &> /dev/null
+EOF

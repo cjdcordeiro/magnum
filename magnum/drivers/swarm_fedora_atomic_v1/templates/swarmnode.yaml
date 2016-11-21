@@ -375,11 +375,11 @@ resources:
       group: ungrouped
       config: {get_file: ../../common/templates/fragments/prometheus.sh}
 
-  swarm_launch_prometheus:
+  swarm_launch_prometheus_grafana:
     type: "OS::Heat::SoftwareConfig"
     properties:
       group: ungrouped
-      config: {get_file: ../../common/templates/swarm/fragments/swarm-launch-prometheus.sh}
+      config: {get_file: ../../common/templates/swarm/fragments/swarm-launch-prometheus-grafana.sh}
 
 
   swarm_node_init:
@@ -394,7 +394,7 @@ resources:
         - config: {get_resource: configure_docker_storage}
         - config: {get_resource: configure_docker_registry}
         - config: {get_resource: prometheus_setup}
-        - config: {get_resource: swarm_launch_prometheus}
+        - config: {get_resource: swarm_launch_prometheus_grafana}
         - config: {get_resource: write_cadvisor_service}
         - config: {get_resource: write_cadvisor_failure_service}
         - config: {get_resource: write_node_exporter_service}
