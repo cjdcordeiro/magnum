@@ -36,14 +36,14 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
 
 docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
-                          run -t -p 3000:3000 -v /var/lib/grafana:/var/lib/grafana:z \\
+                          run -t -d -p 3000:3000 -v /var/lib/grafana:/var/lib/grafana:z \\
                           -e affinity:container==prometheus \\
                           -e "GF_SECURITY_ADMIN_PASSWORD=admin" \\
                           --name grafana grafana/grafana
 
 docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
-                          run -t -v /etc/docker:/etc/docker \\
+                          run -t -d -v /etc/docker:/etc/docker \\
                           -v /etc/sysconfig:/etc/sysconfig \\
                           -v \$PROM_SD_CRON:/etc/cron.d/ \\
                           -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\

@@ -3,7 +3,7 @@
 echo "starting services"
 systemctl daemon-reload
 for service in $NODE_SERVICES; do
-    if ([ "$service" = "swarm-cadvisor" ] || [ "$service" = "swarm-node-exporter" ]) && \
+    if ([ "$service" = "cadvisor" ] || [ "$service" = "node-exporter" ]) && \
       [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]; then
         continue
     fi

@@ -6,6 +6,12 @@ if [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]; the
   exit 0
 fi
 
+if [ -f /usr/local/bin/start-prometheus-grafana ]; then
+  POST_SCRIPT="ExecStartPost=/usr/local/bin/start-prometheus-grafana"
+else
+  POST_SCRIPT=""
+fi
+
 CONF_FILE=/etc/systemd/system/cadvisor.service
 
 cat > $CONF_FILE << EOF
@@ -31,7 +37,7 @@ ExecStart=/usr/bin/docker run -e http_proxy=$HTTP_PROXY \\
                               --name cadvisor \\
                               google/cadvisor:latest
 ExecStop=/usr/bin/docker stop cadvisor
-ExecStartPost=[ -f /usr/local/bin/start-prometheus-grafana ] && /usr/local/bin/start-prometheus-grafana
+$POST_SCRIPT
 
 [Install]
 WantedBy=multi-user.target
