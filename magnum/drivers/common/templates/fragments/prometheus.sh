@@ -42,11 +42,11 @@ SD_EOF
 
 SERVICE_DISCOVERY_CRON=$PROMETHEUS_SHARE"/cron.d"
 mkdir $SERVICE_DISCOVERY_CRON
-echo "PROM_SD_CRON=$SERVICE_DISCOVERY_CRON" > /etc/sysconfig/prometheus-conf-setup
+echo "PROM_SD_CRON=$SERVICE_DISCOVERY_CRON" >> /etc/sysconfig/prometheus-conf-setup
 
 SD_CRONJOB=$SERVICE_DISCOVERY_CRON"/prometheus-sd-cron"
 cat > $SD_CRONJOB <<CRON_EOF
-* * * * * $PROMETHEUS_SHARE_MOUNT"/prometheus-sd-cron" &> /dev/null
+* * * * * $PROMETHEUS_SHARE_MOUNT/prometheus-sd-cron &> /dev/null
 CRON_EOF
 
 SD_REAL_JOB=$PROMETHEUS_SHARE"/prometheus-sd"

@@ -42,7 +42,7 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                           run -t -v /etc/docker:/etc/docker \\
                           -v /etc/sysconfig:/etc/sysconfig \\
-                          -v $PROM_SD_CRON:/etc/cron.d/
+                          -v \$PROM_SD_CRON:/etc/cron.d/
                           -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
                           -e affinity:container==prometheus \\
                           --name prometheus_auto_sd fedora
