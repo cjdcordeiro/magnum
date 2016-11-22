@@ -4,6 +4,9 @@ START_PROMETHEUS='/usr/local/bin/start-prometheus-grafana'
 
 cat >$START_PROMETHEUS <<EOF
 #!/bin/sh
+
+echo "setting up prometheus" > /tmp/test
+
 . /etc/sysconfig/heat-params
 . /etc/sysconfig/prometheus-conf-setup
 
@@ -33,7 +36,7 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
 
 docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
-                          run -t -p 3000:3000 -v /var/lib/grafana:/var/lib/grafana \\
+                          run -t -p 3000:3000 -v /var/lib/grafana:/var/lib/grafana:z \\
                           -e affinity:container==prometheus \\
                           -e "GF_SECURITY_ADMIN_PASSWORD=admin" \\
                           --name grafana grafana/grafana
@@ -42,10 +45,11 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                           run -t -v /etc/docker:/etc/docker \\
                           -v /etc/sysconfig:/etc/sysconfig \\
-                          -v \$PROM_SD_CRON:/etc/cron.d/
+                          -v \$PROM_SD_CRON:/etc/cron.d/ \\
                           -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
+                          -v /usr:/usr -v /var/run/docker.sock:/var/run/docker.sock \\
                           -e affinity:container==prometheus \\
-                          --name prometheus_auto_sd fedora
+                          --name prometheus_auto_sd fedora /bin/bash
 EOF
 
 chown root:root $START_PROMETHEUS

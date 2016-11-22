@@ -60,14 +60,16 @@ SERVER_KEY='/etc/docker/server.key'
 
 NODES=\`docker -H $API_IP_ADDRESS:2376 --tlsverify --tlscacert $CLUSTER_CA \\
                 --tlskey $SERVER_KEY --tlscert $SERVER_CERTIFICATE \\
-                ps | tail -n +2 | awk '{print $NF}' | awk -F'/' '{print $1}' | sort | uniq\`
+                ps | tail -n +2 | awk '{print \$NF}' | awk -F'/' '{print \$1}' | sort | uniq\`
 
 NEW_SD_FILE_CONTENT="- targets:\n"
-for node in $NODES
+for node in \$NODES
 do
-  NEW_SD_FILE_CONTENT=$NEW_SD_FILE_CONTENT"  - $node:8080\n  - $node:9100\n"
+  NEW_SD_FILE_CONTENT=\$NEW_SD_FILE_CONTENT"  - \$node:8080\n  - \$node:9100\n"
 done
-NEW_SD_FILE_CONTENT=$NEW_SD_FILE_CONTENT"  labels:\n  job: magnum-prometheus"
+NEW_SD_FILE_CONTENT=\$NEW_SD_FILE_CONTENT"  labels:\n  job: magnum-prometheus"
+
+echo \$NEW_SD_FILE_CONTENT > $SERVICE_DISCOVERY_FILE_MOUNTED
 SD_EOF
 
 chmod 755 $SD_REAL_JOB
