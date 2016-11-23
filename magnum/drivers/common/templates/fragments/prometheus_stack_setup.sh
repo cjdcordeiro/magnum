@@ -73,3 +73,6 @@ echo \$NEW_SD_FILE_CONTENT > $SERVICE_DISCOVERY_FILE_MOUNTED
 SD_EOF
 
 chmod 755 $SD_REAL_JOB
+
+# setup a directory for grafana
+mkdir -p /var/lib/grafana
