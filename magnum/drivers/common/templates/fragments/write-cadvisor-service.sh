@@ -7,7 +7,7 @@ if [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]; the
 fi
 
 if [ -f /usr/local/bin/start-prometheus-grafana ]; then
-  POST_SCRIPT="ExecStartPost=/usr/local/bin/start-prometheus-grafana"
+  POST_SCRIPT="ExecStartPost=-/usr/local/bin/start-prometheus-grafana"
 else
   POST_SCRIPT=""
 fi
