@@ -18,7 +18,7 @@ PROMETHEUS_CONF=$PROMETHEUS_SHARE"/prometheus.yml"
 SERVICE_DISCOVERY_FILE=$PROMETHEUS_SHARE"/service_discovery.yml"
 SERVICE_DISCOVERY_FILE_MOUNTED=$PROMETHEUS_SHARE_MOUNT"/service_discovery.yml"
 
-cat > $PROMETHEUS_CONF << CONF_EOF
+cat > $PROMETHEUS_CONF <<CONF_EOF
 global:
   scrape_interval: 10s
   evaluation_interval: 15s
@@ -32,7 +32,7 @@ scrape_configs:
 CONF_EOF
 
 # Populate an initial basic service discovery
-cat > $SERVICE_DISCOVERY_FILE << SD_EOF
+cat > $SERVICE_DISCOVERY_FILE <<SD_EOF
 - targets:
   - cadvisor:8080
   - node-exporter:9100
@@ -40,39 +40,67 @@ cat > $SERVICE_DISCOVERY_FILE << SD_EOF
     job: magnum-prometheus
 SD_EOF
 
-SERVICE_DISCOVERY_CRON=$PROMETHEUS_SHARE"/cron.d"
-mkdir $SERVICE_DISCOVERY_CRON
-echo "PROM_SD_CRON=$SERVICE_DISCOVERY_CRON" >> /etc/sysconfig/prometheus-conf-setup
 
-SD_CRONJOB=$SERVICE_DISCOVERY_CRON"/prometheus-sd-cron"
-cat > $SD_CRONJOB <<CRON_EOF
-* * * * * $PROMETHEUS_SHARE_MOUNT/prometheus-sd-cron &> /dev/null
-CRON_EOF
+SD_JOB=$PROMETHEUS_SHARE"/prometheus-sd-job.sh"
+SD_PARSER=$PROMETHEUS_SHARE"/prometheus-sd-parser.py"
+cat > $SD_JOB <<SD_EOF
+#!/bin/bash
 
-SD_REAL_JOB=$PROMETHEUS_SHARE"/prometheus-sd"
-cat > $SD_REAL_JOB <<SD_EOF
-#!/bin/sh
-# We assume /etc/docker and /etc/sysconfig/heat-params are accessible
-. /etc/sysconfig/heat-params
-CLUSTER_CA='/etc/docker/ca.crt'
-SERVER_CERTIFICATE='/etc/docker/server.crt'
-SERVER_KEY='/etc/docker/server.key'
-
-NODES=\`docker -H $API_IP_ADDRESS:2376 --tlsverify --tlscacert $CLUSTER_CA \\
-                --tlskey $SERVER_KEY --tlscert $SERVER_CERTIFICATE \\
-                ps | tail -n +2 | awk '{print \$NF}' | awk -F'/' '{print \$1}' | sort | uniq\`
-
-NEW_SD_FILE_CONTENT="- targets:\n"
-for node in \$NODES
+# Keep the job running
+while true
 do
-  NEW_SD_FILE_CONTENT=\$NEW_SD_FILE_CONTENT"  - \$node:8080\n  - \$node:9100\n"
+  info=\`curl --silent --cacert /etc/docker/ca.crt \\
+      --key /etc/docker/server.key \\
+      --cert /etc/docker/server.crt \\
+      https://$API_IP_ADDRESS:2376/info\`
+  python $PROMETHEUS_SHARE_MOUNT/prometheus-sd-parser.py \\
+      --info="\$info" --sd_file=$SERVICE_DISCOVERY_FILE_MOUNTED
+  sleep 300
 done
-NEW_SD_FILE_CONTENT=\$NEW_SD_FILE_CONTENT"  labels:\n  job: magnum-prometheus"
-
-echo \$NEW_SD_FILE_CONTENT > $SERVICE_DISCOVERY_FILE_MOUNTED
 SD_EOF
 
-chmod 755 $SD_REAL_JOB
+chmod 755 $SD_JOB
+
+cat > $SD_PARSER <<SD_PARSER_EOF
+import argparse
+import json
+
+def parser():
+    parser = argparse.ArgumentParser(description='Prometheus SD parse cluster nodes')
+    parser.add_argument('--info', '-i', type=str, nargs='?', default="",
+              help='json output from cluster info')
+    parser.add_argument('--sd_file', '-f', type=str, nargs='?', default="$SERVICE_DISCOVERY_FILE_MOUNTED",
+              help='SD YAML file where to write to')
+
+    args = parser.parse_args()
+    return args
+
+def flat_list_and_find_ips(info_json, nodes=[]):
+    for el in info_json:
+        if isinstance(el, list):
+            flat_list_and_find_ips(el, nodes)
+        else:
+            # The non-TLS port comes with the nodes ips
+            # This can be changed for Docker API 1.24
+            # where querying the nodes is possible
+            if (isinstance(el, unicode) or \\
+                  isinstance(el, str)) and \\
+                  ":2375" in el.encode('utf-8'):
+                nodes.append(el.encode('utf-8').split(":")[0])
+
+if __name__ == '__main__':
+    args=parser()
+    jinfo = json.loads(args.info)
+    node_list = []
+    flat_list_and_find_ips(jinfo.values(), node_list)
+    with open(args.sd_file, 'w') as sdf:
+        sdf.write("- targets:\n")
+        for node in node_list:
+            sdf.write("  - %s:8080\n" % node)
+            sdf.write("  - %s:9100\n" % node)
+        sdf.write("  labels:\n    job: magnum-prometheus\n")
+SD_PARSER_EOF
+
 
 # setup a directory for grafana
-mkdir -p /var/lib/grafana
+# mkdir -p /var/lib/grafana
