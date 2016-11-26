@@ -23,6 +23,30 @@ do
   sleep 5
 done
 
+
+docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
+                          --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
+                          run -t -d -v /etc/docker:/etc/docker \\
+                          -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
+                          -e affinity:container==prometheus \\
+                          fedora sh /prometheus-data/prometheus-sd-job.sh
+
+                          
+
+prom_status=\$(docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
+                  --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
+                  inspect --format="{{ .State.Running }}" prometheus)
+
+# prometheus container might already exist
+if [ \$? -eq 0 ]; then
+  # If not running, delete it
+  if [ \$prom_status != "true" ]; then
+    docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
+                      --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
+                      rm -f prometheus
+  fi
+fi
+
 # Following will fail if already exists
 docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
@@ -32,12 +56,7 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           -config.file=\$PROM_CONF_DIR_CONTAINER'/prometheus.yml' \\
                           -storage.local.path=/prometheus
 
-docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
-                          --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
-                          run -t -d -v /etc/docker:/etc/docker \\
-                          -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
-                          -e affinity:container==prometheus \\
-                          fedora sh /prometheus-data/prometheus-sd-job.sh
+
 
 
 # Grafana might suffer from https://github.com/docker/docker/pull/21222 in v1.10

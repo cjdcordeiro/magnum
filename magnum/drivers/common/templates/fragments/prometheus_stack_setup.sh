@@ -53,9 +53,9 @@ do
       --key /etc/docker/server.key \\
       --cert /etc/docker/server.crt \\
       https://$API_IP_ADDRESS:2376/info\`
-  python $PROMETHEUS_SHARE_MOUNT/prometheus-sd-parser.py \\
+  python3 $PROMETHEUS_SHARE_MOUNT/prometheus-sd-parser.py \\
       --info="\$info" --sd_file=$SERVICE_DISCOVERY_FILE_MOUNTED
-  sleep 300
+  sleep 120
 done
 SD_EOF
 
@@ -83,10 +83,8 @@ def flat_list_and_find_ips(info_json, nodes=[]):
             # The non-TLS port comes with the nodes ips
             # This can be changed for Docker API 1.24
             # where querying the nodes is possible
-            if (isinstance(el, unicode) or \\
-                  isinstance(el, str)) and \\
-                  ":2375" in el.encode('utf-8'):
-                nodes.append(el.encode('utf-8').split(":")[0])
+            if isinstance(el, str) and ":2375" in el:
+                nodes.append(el.split(":")[0])
 
 if __name__ == '__main__':
     args=parser()
@@ -100,7 +98,6 @@ if __name__ == '__main__':
             sdf.write("  - %s:9100\n" % node)
         sdf.write("  labels:\n    job: magnum-prometheus\n")
 SD_PARSER_EOF
-
 
 # setup a directory for grafana
 # mkdir -p /var/lib/grafana
