@@ -28,10 +28,10 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                           run -t -d -v /etc/docker:/etc/docker \\
                           -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
-                          -e affinity:container==prometheus \\
+                          --name prom-service-discovery \\
                           fedora sh /prometheus-data/prometheus-sd-job.sh
 
-                          
+
 
 prom_status=\$(docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                   --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
@@ -52,6 +52,7 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                           run -t -d -p 9090:9090 \\
                           -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
+                          -e affinity:container==prom-service-discovery \\
                           -v /prometheus --name prometheus prom/prometheus \\
                           -config.file=\$PROM_CONF_DIR_CONTAINER'/prometheus.yml' \\
                           -storage.local.path=/prometheus
