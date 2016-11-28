@@ -383,8 +383,11 @@ resources:
     type: "OS::Heat::SoftwareConfig"
     properties:
       group: ungrouped
-      config: {get_file: ../../common/templates/swarm/fragments/swarm-launch-prometheus-grafana.sh}
-
+      config:
+        str_replace:
+          template: {get_file: ../../common/templates/swarm/fragments/swarm-launch-prometheus-grafana.sh}
+          params:
+            "$GRAFANA_ADMIN_PASSWD": {get_param: grafana_admin_passwd}
 
   swarm_node_init:
     type: "OS::Heat::MultipartMime"
