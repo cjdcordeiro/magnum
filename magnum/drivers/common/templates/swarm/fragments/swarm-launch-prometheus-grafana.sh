@@ -23,16 +23,6 @@ do
   sleep 5
 done
 
-
-docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
-                          --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
-                          run -t -d -v /etc/docker:/etc/docker \\
-                          -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
-                          --name prom-service-discovery \\
-                          fedora sh /prometheus-data/prometheus-sd-job.sh
-
-
-
 prom_status=\$(docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                   --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                   inspect --format="{{ .State.Running }}" prometheus)
@@ -52,17 +42,23 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                           run -t -d -p 9090:9090 \\
                           -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
-                          -e affinity:container==prom-service-discovery \\
                           -v /prometheus --name prometheus prom/prometheus \\
                           -config.file=\$PROM_CONF_DIR_CONTAINER'/prometheus.yml' \\
                           -storage.local.path=/prometheus
 
 
 
+docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
+                          --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
+                          run -t -d -v /etc/docker:/etc/docker \\
+                          -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
+                          -e affinity:container==prometheus \\
+                          fedora sh /prometheus-data/prometheus-sd-job.sh
+
 
 # Grafana might suffer from https://github.com/docker/docker/pull/21222 in v1.10
 # make sure cadvisor doesn't fail because of it
-#docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
+docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                           run -t -d -p 3000:3000 \\
                           -e affinity:container==prometheus \\

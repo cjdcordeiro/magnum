@@ -139,6 +139,12 @@ class ClusterTemplate(base.APIBase):
     floating_ip_enabled = wsme.wsattr(types.boolean, default=True)
     """Indicates whether created clusters should have a floating ip or not."""
 
+    monitoring_enabled = wsme.wsattr(types.boolean, default=False)
+    """Indicates whether to setup the container based monitoring stack."""
+
+    grafana_admin_passwd = wtypes.StringType(min_length=1, max_length=255)
+    """Admin user password for the Grafana monitoring interface."""
+
     def __init__(self, **kwargs):
         self.fields = []
         for field in objects.ClusterTemplate.fields:
@@ -195,7 +201,9 @@ class ClusterTemplate(base.APIBase):
             updated_at=timeutils.utcnow(),
             public=False,
             master_lb_enabled=False,
-            floating_ip_enabled=True)
+            floating_ip_enabled=True,
+            monitoring_enabled=True,
+            grafana_admin_passwd='admin')
         return cls._convert_with_links(sample, 'http://localhost:9511')
 
 

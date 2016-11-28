@@ -13,6 +13,10 @@ parameters:
     description: >
       whether or not to have the cadvisor running on the node
 
+  grafana_admin_passwd:
+    type: string
+    description: >
+      admin user password for the Grafana monitoring interface
   # --------------
 
   server_image:
@@ -373,7 +377,7 @@ resources:
     type: "OS::Heat::SoftwareConfig"
     properties:
       group: ungrouped
-      config: {get_file: ../../common/templates/fragments/prometheus_stack_setup.sh}
+      config: {get_file: ../../common/templates/swarm/fragments/prometheus_stack_setup.sh}
 
   swarm_launch_prometheus_grafana:
     type: "OS::Heat::SoftwareConfig"

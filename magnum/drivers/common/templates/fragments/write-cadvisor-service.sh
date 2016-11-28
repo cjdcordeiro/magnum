@@ -3,6 +3,7 @@
 . /etc/sysconfig/heat-params
 
 if [ "$(echo $MONITORING_ENABLED | tr '[:upper:]' '[:lower:]')" = "false" ]; then
+  echo "asdadasfasfasfasdasD" > /tmp/adsasd
   exit 0
 fi
 

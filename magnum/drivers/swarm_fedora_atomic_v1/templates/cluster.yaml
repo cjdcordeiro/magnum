@@ -48,6 +48,12 @@ parameters:
     description: >
       whether or not to have the grafana-prometheus-cadvisor monitoring setup
 
+  grafana_admin_passwd:
+    type: string
+    default: admin
+    description: >
+      admin user password for the Grafana monitoring interface
+
   # --------------
   master_flavor:
     type: string
