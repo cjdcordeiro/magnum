@@ -35,6 +35,7 @@ ExecStart=/usr/bin/docker run -e http_proxy=$HTTP_PROXY \\
                               --volume=/sys:/sys:ro \\
                               --volume=/var/lib/docker/:/var/lib/docker:ro \\
                               --publish=8080:8080 \\
+                              --privileged=true \\
                               --name cadvisor \\
                               google/cadvisor:latest
 ExecStop=/usr/bin/docker stop cadvisor

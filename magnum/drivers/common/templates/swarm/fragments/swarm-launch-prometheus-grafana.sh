@@ -34,6 +34,8 @@ if [ \$? -eq 0 ]; then
     docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                       --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                       rm -f prometheus
+  else
+    exit 0
   fi
 fi
 
@@ -62,8 +64,14 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                           run -t -d -p 3000:3000 \\
                           -e affinity:container==prometheus \\
-                          -e "GF_SECURITY_ADMIN_PASSWORD=admin" \\
-                          grafana/grafana
+                          -e "GF_SECURITY_ADMIN_PASSWORD=$GRAFANA_ADMIN_PASSWD" \\
+                          grafana/grafana && \\
+curl --user admin:$GRAFANA_ADMIN_PASSWD -X POST \\
+                          -H 'Content-Type: application/json;charset=UTF-8' \\
+                          --data-binary \\
+                          '{"name":"Swarm Monitoring","isDefault":true,\\
+                            "type":"prometheus","url":"http://localhost:9090",\\
+                            "access":"direct"}' "http://localhost:3000/api/datasources/"
 EOF
 
 chown root:root $START_PROMETHEUS

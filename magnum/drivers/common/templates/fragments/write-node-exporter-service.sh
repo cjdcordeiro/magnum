@@ -25,7 +25,7 @@ ExecStart=/usr/bin/docker run -e http_proxy=$HTTP_PROXY \\
                               -e no_proxy=$NO_PROXY \\
                               --publish=9100:9100 \\
                               --name node-exporter \\
-                              prom/node-exporter
+                              prom/node-exporter:0.12.0
 ExecStop=/usr/bin/docker stop node-exporter
 
 [Install]
