@@ -5,8 +5,6 @@ START_PROMETHEUS='/usr/local/bin/start-prometheus-grafana'
 cat >$START_PROMETHEUS <<EOF
 #!/bin/sh
 
-echo "setting up prometheus" > /tmp/test
-
 . /etc/sysconfig/heat-params
 . /etc/sysconfig/prometheus-conf-setup
 
