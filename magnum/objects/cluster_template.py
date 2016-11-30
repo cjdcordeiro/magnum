@@ -77,8 +77,7 @@ class ClusterTemplate(base.MagnumPersistentObject, base.MagnumObject,
         'server_type': fields.StringField(nullable=True),
         'insecure_registry': fields.StringField(nullable=True),
         'master_lb_enabled': fields.BooleanField(default=False),
-        'floating_ip_enabled': fields.BooleanField(default=True),
-        'monitoring_enabled': fields.BooleanField(default=False)
+        'floating_ip_enabled': fields.BooleanField(default=True)
     }
 
     @staticmethod
