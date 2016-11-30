@@ -67,8 +67,8 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
 curl --user admin:$GRAFANA_ADMIN_PASSWD -X POST \\
                           -H 'Content-Type: application/json;charset=UTF-8' \\
                           --data-binary \\
-                          '{"name":"Swarm Monitoring","isDefault":true,\\
-                            "type":"prometheus","url":"http://localhost:9090",\\
+                          '{"name":"Swarm Monitoring","isDefault":true,
+                            "type":"prometheus","url":"http://localhost:9090",
                             "access":"direct"}' "http://localhost:3000/api/datasources/"
 EOF
 
