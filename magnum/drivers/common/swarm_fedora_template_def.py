@@ -69,10 +69,6 @@ class SwarmFedoraTemplateDefinition(template_def.BaseTemplateDefinition):
                            cluster_template_attr='docker_storage_driver')
         self.add_parameter('swarm_version',
                            cluster_attr='coe_version')
-        self.add_parameter('monitoring_enabled',
-                           cluster_template_attr='monitoring_enabled')
-        self.add_parameter('grafana_admin_passwd',
-                           cluster_template_attr='grafana_admin_passwd')
 
         self.add_output('api_address',
                         cluster_attr='api_address',
