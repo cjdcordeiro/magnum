@@ -63,13 +63,19 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           run -t -d -p 3000:3000 \\
                           -e affinity:container==prometheus \\
                           -e "GF_SECURITY_ADMIN_PASSWORD=$GRAFANA_ADMIN_PASSWD" \\
-                          grafana/grafana && \\
+                          grafana/grafana
+
+PROMETHEUS_IP=`docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA  \\
+                          --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
+                          inspect prometheus | python -c \\
+                          "import sys, json; print json.load(sys.stdin)[0]['NetworkSettings']['IPAddress']"`
+
 curl --user admin:$GRAFANA_ADMIN_PASSWD -X POST \\
                           -H 'Content-Type: application/json;charset=UTF-8' \\
                           --data-binary \\
                           '{"name":"Swarm Monitoring","isDefault":true,
-                            "type":"prometheus","url":"http://localhost:9090",
-                            "access":"direct"}' "http://localhost:3000/api/datasources/"
+                            "type":"prometheus","url":"http://$PROMETHEUS_IP:9090",
+                            "access":"direct"}' "http://$PROMETHEUS_IP:3000/api/datasources/"
 EOF
 
 chown root:root $START_PROMETHEUS
