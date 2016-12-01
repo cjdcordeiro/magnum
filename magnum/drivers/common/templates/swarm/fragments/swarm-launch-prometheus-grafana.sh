@@ -65,10 +65,10 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           -e "GF_SECURITY_ADMIN_PASSWORD=$GRAFANA_ADMIN_PASSWD" \\
                           grafana/grafana
 
-PROMETHEUS_IP=`docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA  \\
+PROMETHEUS_IP=\`docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA  \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
                           inspect prometheus | python -c \\
-                          "import sys, json; print json.load(sys.stdin)[0]['NetworkSettings']['IPAddress']"`
+                          "import sys, json; print json.load(sys.stdin)[0]['NetworkSettings']['IPAddress']"\`
 
 curl --user admin:$GRAFANA_ADMIN_PASSWD -X POST \\
                           -H 'Content-Type: application/json;charset=UTF-8' \\
