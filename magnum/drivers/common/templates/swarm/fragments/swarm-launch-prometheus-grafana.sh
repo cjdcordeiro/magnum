@@ -46,6 +46,9 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           -config.file=\$PROM_CONF_DIR_CONTAINER'/prometheus.yml' \\
                           -storage.local.path=/prometheus
 
+if [ \$? -ne 0 ]; then
+  exit 0
+fi
 
 docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
