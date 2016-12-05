@@ -46,6 +46,8 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           -config.file=\$PROM_CONF_DIR_CONTAINER'/prometheus.yml' \\
                           -storage.local.path=/prometheus
 
+# Exit if some other concurrent node is already taking care of the deployment
+# or if it just fails
 if [ \$? -ne 0 ]; then
   exit 0
 fi
@@ -55,27 +57,16 @@ docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
                           run -t -d -v /etc/docker:/etc/docker \\
                           -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
                           -e affinity:container==prometheus \\
-                          python:alpine
-# docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
-#                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
-#                           run -t -d -v /etc/docker:/etc/docker \\
-#                           -v \$PROM_CONF_DIR_HOST:\$PROM_CONF_DIR_CONTAINER:z \\
-#                           -e affinity:container==prometheus \\
-#                           fedora sh /prometheus-data/prometheus-sd-job.sh
+                          fedora sh /prometheus-data/prometheus-sd-job.sh
 
-docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
-                          --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
-                          run -t -d \\
-                          -e affinity:container==prometheus \\
-                          debian
 # Grafana might suffer from https://github.com/docker/docker/pull/21222 in v1.10
 # make sure cadvisor doesn't fail because of it
-# docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
-#                           --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
-#                           run -t -d -p 3000:3000 \\
-#                           -e affinity:container==prometheus \\
-#                           -e "GF_SECURITY_ADMIN_PASSWORD=$GRAFANA_ADMIN_PASSWD" \\
-#                           grafana/grafana
+docker -H \$API_IP_ADDRESS:2376 --tlsverify --tlscacert \$CLUSTER_CA \\
+                          --tlskey \$SERVER_KEY --tlscert \$SERVER_CERTIFICATE \\
+                          run -t -d -p 3000:3000 \\
+                          -e affinity:container==prometheus \\
+                          -e "GF_SECURITY_ADMIN_PASSWORD=$GRAFANA_ADMIN_PASSWD" \\
+                          grafana/grafana
 
 #
 # Useful to automatically inject the datasource into Grafana, but we would have
